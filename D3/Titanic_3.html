@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+  <style>
+    h2 {
+      text-align: center;
+      color: black;
+    }
+
+    div.type_buttons {
+        text-align: center;
+        position: fixed;
+        top: 400px;
+        right: 10px;
+    }
+
+    div.type_buttons div {
+        background-color: #2196F3;
+        padding: 3px;
+        margin: 7px;
+    }
+
+  </style>
+  <script type="text/javascript">
+    function draw(data){
+      "use strict";
+      var margin = 300,
+           width = 1400 - margin,
+           height = 600 - margin;
+
+      d3.select("body")
+        .append("h2")
+        .text("泰坦尼克号事故生存数据分析");
+
+
+      var button_label_1 = ['乘客人数','Survived','Survived_rate'];
+      
+      var buttons = d3.select("body")
+                      .append("div")
+                      .attr("class", "type_buttons")
+                      .selectAll("div")
+                      .data(button_label_1)
+                      .enter()
+                      .append("div")
+                      .text(function(d) {
+                        return d;
+                      });
+
+      buttons.on("click", function(d) {
+        d3.select(".type_buttons")
+          .selectAll("div")
+          .transition()
+          .duration(500)
+          .style("color", "black")
+          .style("background", "#2196F3");
+
+                    //d3.select(this)
+                      //.transition()
+                      //.duration(500)
+                      //.style("background", "lightBlue")
+                      //.style("color", "white");
+        update_Chart(d);
+    
+      });
+
+      var svg = d3.select("body")
+                  .append("svg")
+                  .attr("width", width + margin)
+                  .attr("height", height + margin)
+                  .append('g')
+                  .attr('class','chart');
+
+      function update_Chart(yAxis){
+
+      svg.selectAll('*').remove();//清除所有画布
+
+      var ageData = [];
+      var countData = data.length;
+      data.forEach(d => {
+        if(d["Survived"] == 1){
+          if(d["Age"] < 15){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"儿童 (0-14岁)", "乘客人数":1,"Survived":1,"Survived_rate":1/countData});
+          }else if(d["Age"] < 23){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"青少年 (15-22岁)","乘客人数":1,"Survived":1,"Survived_rate":1/countData});
+          }else if(d["Age"] < 60){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"成年人 (23-59岁)","乘客人数":1,"Survived":1,"Survived_rate":1/countData});
+          }else if(d["Age"] >= 60){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"老年人 (60岁及以上)","乘客人数":1,"Survived":1,"Survived_rate":1/countData});
+          }else{
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"未知","乘客人数":1,"Survived":1,"Survived_rate":1/countData});
+          }
+        }else{
+          if(d["Age"] < 15){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"儿童 (0-14岁)", "乘客人数":1,"Survived":0,"Survived_rate":0});
+          }else if(d["Age"] < 23){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"青少年 (15-22岁)","乘客人数":1,"Survived":0,"Survived_rate":0});
+          }else if(d["Age"] < 60){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"成年人 (23-59岁)","乘客人数":1,"Survived":0,"Survived_rate":0});
+          }else if(d["Age"] >= 60){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"老年人 (60岁及以上)","乘客人数":1,"Survived":0,"Survived_rate":0});
+          }else{
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"未知","乘客人数":1,"Survived":0,"Survived_rate":0});
+          }
+        }    
+        return ageData;
+      });
+      var myChart = new dimple.chart(svg, ageData);
+      var x = myChart.addCategoryAxis("x", ["AgeCat","Sex"]);
+      x.addOrderRule(["儿童 (0-14岁)",
+                      "青少年 (15-22岁)",
+                      "成年人 (23-59岁)",
+                      "老年人 (60岁及以上)",
+                      "未知"]);
+      x.title = "年龄组别";
+      x.addGroupOrderRule(["male", "female"]) 
+      var y = myChart.addMeasureAxis("y", yAxis);
+
+      if (yAxis === "乘客人数") {      
+        y.title = "乘客人数";
+      } else if (yAxis === "Survived") {
+        y.title = "幸存人数";
+      } else if (yAxis === "Survived_rate") {
+        y.title = "幸存率";
+        y.tickFormat = "%";
+      }
+
+      var mySeries = myChart.addSeries(["Sex"], dimple.plot.bar);
+      mySeries.aggregate = dimple.aggregateMethod.sum;
+      myChart.addLegend(780, 22, 500, 20, "right");
+      myChart.draw(1000); 
+      };
+
+      update_Chart('Survived')
+
+    };
+       
+  </script>
+</head>
+<body>
+    <script type="text/javascript">
+  /*
+    Use D3 (not dimple.js) to load the TSV file
+    and pass the contents of it to the draw function
+    */
+    d3.csv("titanic_data.csv", function(d){
+      d["Survived"] = + d["Survived"];
+      d["Age"] = + d["Age"];
+      return d;
+    },draw);
+    </script>
+</body>
+</html>

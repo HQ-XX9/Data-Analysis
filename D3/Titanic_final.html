@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+  <style>
+    button{
+      border: none;
+      border-radius: 3px;
+      background-color: #2196F3;
+      box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.33);
+      margin-right: 10px;
+      padding: 3px 10px;
+    }
+
+    div.title{
+      position:absolute;
+      top: 220px;
+      left: 185px;
+      display: table;
+      text-align: center;
+      display: table-cell;
+      vertical-align: middle;
+      max-width: none;
+    }
+
+    button.animated.fadeIn.storybutton{
+      position:absolute;
+      top: 430px;
+      left: 1142px;
+      margin: auto;
+    }
+
+    button.animated.fadeIn.storybutton2{
+      position:absolute;
+      top: 470px;
+      left: 1171px;
+      margin: auto;
+    }
+
+    button.animated.fadeIn.explore0{
+      position:absolute;
+      top: 330px;
+      left: 1145px;
+    }
+
+    button.animated.fadeIn.explore1{
+      position:absolute;
+      top: 380px;
+      left: 1145px;
+    }
+
+    button.animated.fadeIn.explore2{
+      position:absolute;
+      top: 430px;
+      left: 1153px;
+    }
+
+    button.animated.fadeIn.explore3{
+      position:absolute;
+      top: 480px;
+      left: 1140px;
+    }
+
+    button.animated.fadeIn.explore4{
+      position:absolute;
+      top: 530px;
+      left: 1153px;
+    }
+
+    p{
+      position:absolute;
+      top: 220px;
+      left: 1100px;
+    }
+
+  </style>
+  <script type="text/javascript">
+  
+    function draw(data){
+      //为动画添加各个图层和按钮的设置与布局
+      d3.select("body")
+        .append("div")
+        .attr("class","title")
+        .attr("id","cover")
+        //.select("div")
+        .append("h1")
+        .text("泰坦尼克号事故生存数据分析")
+      d3.select("#cover")
+        .append("h4")
+        .attr("id","text1")
+        .text("——————基于性别和年龄")
+      d3.select("#cover")
+        .append("button")
+        .attr("id","开始分析")
+        .text("开始分析")
+
+      d3.select("body")
+        .append("div")
+        .attr("style","display: none")
+        .attr("class","animated fadeIn")
+        .attr("id","page1")
+      d3.select("#page1")
+        .append("button")
+        .attr("class","animated fadeIn storybutton")
+        .attr("id","第二步分析")
+        .text("下一步分析:生还人数")
+      d3.select("#page1")
+        .append("button")
+        .attr("class","animated fadeIn storybutton2")
+        .attr("id","回到封面")
+        .text("回到封面")
+      d3.select("#page1")  
+        .append("p")
+        .text("从船上乘客的数据可以看出，各个年龄群组内的男性人数较高于女性人数")
+
+      d3.select("body")
+        .append("div")
+        .attr("style","display: none")
+        .attr("class","animated fadeIn")
+        .attr("id","page2")
+      d3.select("#page2")
+        .append("button")
+        .attr("class","animated fadeIn storybutton")
+        .attr("id","第三步分析")
+        .text("下一步分析：生存率")
+      d3.select("#page2")
+        .append("button")
+        .attr("class","animated fadeIn storybutton2")
+        .attr("id","乘客人数")
+        .text("乘客人数")
+      d3.select("#page2")  
+        .append("p")
+        .text("从幸存人数的数据来看，各个年龄群组内的女性幸存者人数反而高于男性幸存者，与乘客数据形成鲜明对比")
+
+      d3.select("body")
+        .append("div")
+        .attr("style","display: none")
+        .attr("class","animated fadeIn")
+        .attr("id","page3")
+      d3.select("#page3")
+        .append("button")
+        .attr("class","animated fadeIn storybutton")
+        .attr("id","进一步探索")
+        .text("进一步分析与探索")
+      d3.select("#page3")  
+        .append("button")
+        .attr("class","animated fadeIn storybutton2")
+        .attr("id","幸存人数")
+        .text("幸存人数")
+      d3.select("#page3")  
+        .append("p")
+        .text("进一步从幸存率来看数据，发现除了儿童组的男性存活率与其他组女性存活率相差无几，其他组的男性存活率远低于女性存活率，由此可以作出结论，女性和儿童的生存率较高，这可能是出于保护弱小的理由，在生存资源有限的情况下，船上的乘客把资源都留给了妇女和儿童")
+
+      d3.select("body")
+        .append("div")
+        .attr("style","display: none")
+        .attr("id","page4")
+      d3.select("#page4")
+        .append("button")
+        .attr("class","animated fadeIn explore0")
+        .attr("id","乘客数据")
+        .text("乘客人数")
+      d3.select("#page4")
+        .append("button")
+        .attr("class","animated fadeIn explore1")
+        .attr("id","幸存数据")
+        .text("幸存人数")
+      d3.select("#page4")
+        .append("button")
+        .attr("class","animated fadeIn explore2")
+        .attr("id","幸存率")
+        .text("幸存率")
+      d3.select("#page4")
+        .append("button")
+        .attr("class","animated fadeIn explore3")
+        .attr("id","船舱幸存情况")
+        .text("船舱幸存情况")
+      d3.select("#page4")
+        .append("button")
+        .attr("class","animated fadeIn explore4")
+        .attr("id","探索-回到封面")
+        .text("回到封面")
+      d3.select("#page4")      
+        .append("p")
+        .attr("id","bye_word")
+        .text("本次分析到此结束，欢迎对该数据分析有兴趣的朋友继续探索")
+
+      //为各个按钮设置更新的图层和图表
+      d3.select('#开始分析').on('click', function() {
+                // trigger the remove function
+                var cover = document.getElementById('cover')
+                cover.style.display = "none" 
+                var page1 = document.getElementById('page1')
+                page1.style.display = "initial" 
+                update_Chart('乘客人数') 
+        })
+
+      d3.select('#第二步分析').on('click', function() {
+                // trigger the remove function
+                var page1 = document.getElementById('page1')
+                page1.style.display = "none" 
+                var page2 = document.getElementById('page2')
+                page2.style.display = "initial" 
+                update_Chart('幸存人数') 
+        })
+
+      d3.select('#回到封面').on('click', function() {
+                // trigger the remove function
+                var page1 = document.getElementById('page1')
+                page1.style.display = "none" 
+                var cover = document.getElementById('cover')
+                cover.style.display = "initial" 
+                svg.selectAll('*').remove(); 
+        })
+
+      d3.select('#第三步分析').on('click', function() {
+                // trigger the remove function
+                var page2 = document.getElementById('page2')
+                page2.style.display = "none" 
+                var page3 = document.getElementById('page3')
+                page3.style.display = "initial" 
+                update_Chart('幸存率') 
+        })
+
+      d3.select('#乘客人数').on('click', function() {
+                // trigger the remove function
+                var page2 = document.getElementById('page2')
+                page2.style.display = "none" 
+                var page1 = document.getElementById('page1')
+                page1.style.display = "initial" 
+                update_Chart('乘客人数') 
+        })
+
+      d3.select('#进一步探索').on('click', function() {
+                // trigger the remove function
+                var page3 = document.getElementById('page3')
+                page3.style.display = "none" 
+                var bye_word = document.getElementById('bye_word')
+                bye_word.style.display = "initial"
+                var page4 = document.getElementById('page4')
+                page4.style.display = "initial" 
+                svg.selectAll('*').remove();
+        })
+
+      d3.select('#幸存人数').on('click', function() {
+                // trigger the remove function
+                var page3 = document.getElementById('page3')
+                page3.style.display = "none" 
+                var page2 = document.getElementById('page2')
+                page2.style.display = "initial" 
+                update_Chart('幸存人数') 
+        })
+
+      d3.select('#乘客数据').on('click', function(){
+                var bye_word = document.getElementById('bye_word')
+                bye_word.style.display = "none" 
+                update_Chart('乘客人数');
+        })
+
+      d3.select('#幸存数据').on('click', function(){
+                var bye_word = document.getElementById('bye_word')
+                bye_word.style.display = "none" 
+                update_Chart('幸存人数');
+        })
+
+      d3.select('#幸存率').on('click', function(){
+                var bye_word = document.getElementById('bye_word')
+                bye_word.style.display = "none" 
+                update_Chart('幸存率');
+        })
+
+      d3.select('#船舱幸存情况').on('click', function(){
+                var bye_word = document.getElementById('bye_word')
+                bye_word.style.display = "none" 
+                update_Chart('船舱幸存情况');
+        })
+
+      d3.select('#探索-回到封面').on('click', function(){
+                var page4 = document.getElementById('page4')
+                page4.style.display = "none" 
+                svg.selectAll('*').remove()
+                var cover = document.getElementById('cover')
+                cover.style.display = "initial" ;
+        })
+
+      //创建画布并设置画布的规格
+      "use strict";
+      var margin = 75,
+           width = 1200 - margin,
+           height = 600 - margin;
+
+
+      var svg = d3.select("body")
+                  .append("svg")
+                  .attr("width", width + margin)
+                  .attr("height", height + margin)
+                  .append('g')
+                  .attr('class','chart');
+
+      //画图
+      function update_Chart(yAxis){
+
+      svg.selectAll('*').remove();//清除所有画布
+
+      //为实现生存率的可视化，对原始数据进行转换
+      var ageData = [];
+      var countData = data.length;//统计数据长度
+      var countAge = {"Total": data.length,
+                      "<15_fe": 0,
+                      "<15_ma":0,
+                      "<23_fe": 0,
+                      "<23_ma":0,
+                      "<60_fe":0,
+                      "<60_ma": 0,
+                      ">=60_fe":0,
+                      ">=60_ma":0,
+                      "unknow_fe": 0,
+                      "unknow_ma":0}; // 为统计各组数据数量设置字典
+
+      // 循环统计数量
+      data.forEach(d => {
+        if(d["Age"] < 15 && d["Age"]>0 && d["Sex"]=="female"){
+          countAge["<15_fe"] += 1;
+        }else if(d["Age"] < 15 && d["Age"]>0 && d["Sex"]=="male"){
+          countAge["<15_ma"] +=1;
+        }else if(d["Age"] < 23 && d["Age"]>0 && d["Sex"]=="female"){
+          countAge["<23_fe"] += 1;
+        }else if(d["Age"] < 23 && d["Age"]>0 && d["Sex"]=="male"){
+          countAge["<23_ma"] += 1;
+        }else if(d["Age"] < 60 && d["Age"]>0 && d["Sex"]=="female"){
+          countAge["<60_fe"] += 1;
+        }else if(d["Age"] < 60 && d["Age"]>0 && d["Sex"]=="male"){
+          countAge["<60_ma"] += 1;
+        }else if(d["Age"] >= 60 && d["Sex"]=="female"){
+          countAge[">=60_fe"] += 1;
+        }else if(d["Age"] >= 60 && d["Sex"]=="male"){
+          countAge[">=60_ma"] += 1;
+        }else if(d["Sex"]=="female"){
+          countAge["unknow_fe"] += 1;
+        }else{
+          countAge["unknow_ma"] += 1;
+        }
+        return countAge;
+      });
+
+      //筛选所需数据
+      data.forEach(d => {
+        if(d["Survived"] == "幸存"){
+          if(d["Age"] < 15 && d["Age"]>0 && d["Sex"]=="female"){
+            ageData.push({"Age":d["Age"], "Sex":d["Sex"], "AgeCat":"儿童（0-14岁）", "Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":1,"幸存率":1/countAge["<15_fe"]});
+          }else if(d["Age"] < 15 && d["Age"]>0 && d["Sex"]=="male"){
+            ageData.push({"Age":d["Age"], "Sex":d["Sex"], "AgeCat":"儿童（0-14岁）", "Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":1,"幸存率":1/countAge["<15_ma"]});
+          }else if(d["Age"] < 23 && d["Age"]>0 && d["Sex"]=="female"){
+            ageData.push({"Age":d["Age"], "Sex":d["Sex"], "AgeCat":"青少年 (15-22岁)","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":1,"幸存率":1/countAge["<23_fe"]});
+          }else if(d["Age"] < 23 && d["Age"]>0 && d["Sex"]=="male"){
+            ageData.push({"Age":d["Age"], "Sex":d["Sex"], "AgeCat":"青少年 (15-22岁)","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":1,"幸存率":1/countAge["<23_ma"]});
+          }else if(d["Age"] < 60 && d["Age"]>0 && d["Sex"]=="female"){
+            ageData.push({"Age":d["Age"], "Sex":d["Sex"], "AgeCat":"成年人 (23-59岁)","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":1,"幸存率":1/countAge["<60_fe"]});
+          }else if(d["Age"] < 60 && d["Age"]>0 && d["Sex"]=="male"){
+            ageData.push({"Age":d["Age"], "Sex":d["Sex"], "AgeCat":"成年人 (23-59岁)","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":1,"幸存率":1/countAge["<60_ma"]});
+          }else if(d["Age"] >=60 && d["Sex"]=="female"){
+            ageData.push({"Age":d["Age"], "Sex":d["Sex"], "AgeCat":"老年人 (60岁及以上)","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":1,"幸存率":1/countAge[">=60_fe"]});
+          }else if(d["Age"] >= 60 && d["Sex"]=="male"){
+            ageData.push({"Age":d["Age"], "Sex":d["Sex"], "AgeCat":"老年人 (60岁及以上)","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":1,"幸存率":1/countAge[">=60_ma"]});
+          }else if(d["Sex"]=="female"){
+            ageData.push({"Age":d["Age"], "Sex":d["Sex"], "AgeCat":"未知","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":1,"幸存率":1/countAge["unknow_fe"]});
+          }else{
+            ageData.push({"Age":d["Age"], "Sex":d["Sex"], "AgeCat":"未知","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":1,"幸存率":1/countAge["unknow_ma"]});
+          }
+        }else{
+          if(d["Age"] < 15 && d["Age"]>0){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"儿童（0-14岁）","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":1,"幸存率":0});
+          }else if(d["Age"] < 23 && d["Age"]>0){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"青少年 (15-22岁)","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":0,"幸存率":0});
+          }else if(d["Age"] < 60 && d["Age"]>0){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"成年人 (23-59岁)","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":0,"幸存率":0});
+          }else if(d["Age"] >= 60){
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"老年人 (60岁及以上)","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":0,"幸存率":0});
+          }else{
+            ageData.push({"Age":+d["Age"], "Sex":d["Sex"], "AgeCat":"未知","Cabin_Class":d["Cabin_Class"],"乘客人数":1,"status":d["Status"],"幸存人数":0,"幸存率":0});
+          }
+        }    
+        return ageData;
+      });
+
+      //在画布上面画图表
+      var myChart = new dimple.chart(svg, ageData);
+      //myChart.setBounds(70, 60, 1000, 500);
+      //为不同变量的dimple图表进行设置
+      if (yAxis==="船舱幸存情况"){
+        
+        var x = myChart.addCategoryAxis("x",["Cabin_Class", "Sex"]);
+        x.addOrderRule(["1(High)",
+                        "2(Medium)",
+                        "3(Low)"]);
+        x.title = "船舱级别";
+        x.addGroupOrderRule(["male", "female"]);
+        var y = myChart.addMeasureAxis("y","乘客人数");
+        y.title = "船舱幸存情况";
+        var mySeries = myChart.addSeries(["status"], dimple.plot.bar);
+        mySeries.aggregate = dimple.aggregateMethod.count;
+        mySeries.addOrderRule(["幸存", "遇难"]);
+        myChart.addLegend(580, 22, 510, 20, "right");
+        myChart.draw(1000);
+
+      }else{
+        var x = myChart.addCategoryAxis("x", ["AgeCat","Sex"]);
+        x.addOrderRule(["儿童（0-14岁）",
+                      "青少年 (15-22岁)",
+                      "成年人 (23-59岁)",
+                      "老年人 (60岁及以上)",
+                      "未知"]);
+        x.title = "年龄组别";
+        x.addGroupOrderRule(["male", "female"]) 
+        var y = myChart.addMeasureAxis("y", yAxis);
+        var mySeries = myChart.addSeries(["Sex"], dimple.plot.bar);
+        mySeries.aggregate = dimple.aggregateMethod.sum;
+        myChart.addLegend(580, 22, 500, 20, "right");
+        if (yAxis=="乘客人数"){
+          y.title = "乘客人数";
+        }else if (yAxis === "幸存人数") {
+          y.title = "幸存人数";
+        }else if (yAxis === "幸存率") {
+          y.title = "幸存率";
+          y.tickFormat = "%";
+        }
+        myChart.draw(1000); 
+      }
+      };
+
+    };
+       
+  </script>
+</head>
+<body>
+    <script type="text/javascript">
+  
+    //使用d3加载csv数据，并转化其中某些数据，运行draw函数 
+    d3.csv("titanic_data.csv", function(d){
+      d["Survived"] = + d["Survived"];
+      d.Cabin_Class = (d.Pclass  === '1')? '1(High)':((d.Pclass === '2')?'2(Medium)':'3(Low)');
+      if(d["Survived"] == 1){
+        d["Survived"] = "幸存";
+      }else{
+        d["Survived"] = "遇难";
+      }
+      d.Status = d.Survived
+      return d;
+    },draw);
+    </script>
+</body>
+</html>
