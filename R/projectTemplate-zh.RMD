@@ -1,0 +1,419 @@
+Winequality
+========================================================
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# 加载你最终使用的所有组件
+# 在这个代码块的分析中。
+
+# 注意，在这个代码块中，将参数 "echo" 设为假。
+# This prevents the code from displaying in the knitted HTML output.这可以避免代码混入 HTML 输出显示。
+# 应当在文件中，对所有代码块设为 echo=FALSE 。
+
+library(ggplot2)
+library(GGally)
+library(ggthemes)
+library(knitr)
+library(lattice)
+library(MASS)
+library(memisc)
+library(RColorBrewer)
+library(scales)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, loading}
+# 加载数据
+#fixed.acidity(非挥发性酸)：大多数与葡萄酒有关的酸或固定或不挥发(不容易蒸发)
+#volatile.acidity(挥发性酸)：葡萄酒中醋酸的含量过高会导致不愉快的醋味
+#citric.acid(柠檬酸):少量的柠檬酸可以增加葡萄酒的新鲜度和风味
+#residual.sugar(剩余糖分):发酵结束后剩余的糖量，少于1克/升的葡萄酒和大于45克/升的葡萄酒基本不被认为是甜的
+#chlorides(氯化物):酒里的盐含量
+#free.sulfur.dioxide(游离二氧化硫):以SO2的游离形式存在于SO2分子(溶解气)和亚硫酸氢离子之间的平衡中;它可以防止微生物的生长和葡萄酒的氧化
+#total.sulfur.dioxide(总二氧化硫)：S02的游离和绑定形式;在低浓度的情况下，SO2在葡萄酒中几乎是无法检测的，但是在游离SO2浓度超过50ppm时，SO2在葡萄酒的味道中变得明显
+#density(密度)：水的密度与水的浓度接近，这取决于酒精和糖的含量
+#pH：描述一种葡萄酒的酸性或碱性从0(非常酸性)到14(非常基本);大多数葡萄酒的pH值在3-4之间
+#sulphates(硫酸盐)：一种能促进二氧化硫(S02)水平的葡萄酒添加剂，它具有抗菌和抗氧化剂的作用
+#alcohol：酒中酒精含量的百分比
+winequality=read.csv('wineQualityReds.csv')
+```
+
+# 单变量绘图选择
+
+首先来看一下整体结构和最关注的红酒质量分布
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_one}
+#使html没有warning和message的设置message=FALSE, warning=FALSE
+# ## 在markdown 语法中的使用，即分层目录
+names(winequality)
+str(winequality)
+summary(winequality)
+ggplot(data=winequality,aes(x=quality))+
+  geom_bar()
+```
+
+从直方图可以看出quality为5和6的项是最多的。
+接下来看看数据集中其他变量的分布情况。
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_two}
+ggplot(data=winequality,aes(x=fixed.acidity))+
+  geom_histogram()
+```
+
+基本集中在6—10之间
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_three}
+ggplot(data=winequality,aes(x=volatile.acidity))+
+  geom_histogram()
+summary(winequality$volatile.acidity)
+```
+
+可以看出75%的volatile.acidity含量低于1
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_four}
+ggplot(data=winequality,aes(x=citric.acid))+
+  geom_histogram()+
+  scale_x_continuous(limits = c(0,0.9))
+summary(winequality$citric.acid)
+```
+
+50%的citric.acid含量低于0.26，且最大值为1
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_five}
+ggplot(data=winequality,aes(x=residual.sugar))+
+  geom_histogram()+
+  scale_x_log10(limits=c(1,16))
+summary(winequality$residual.sugar)
+range(winequality$residual.sugar)
+```
+
+residual.sugar中出现最多次的值为1.8~2.3之间,且75%小于2.6
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_six}
+ggplot(data=winequality,aes(x=chlorides))+
+  geom_histogram()+
+  scale_x_log10()
+summary(winequality$chlorides)
+```
+
+75%的chlorides含量小于0.09
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_seven}
+ggplot(data=winequality,aes(x=free.sulfur.dioxide))+
+  geom_histogram(binwidth = 1)
+```
+
+由于二氧化硫游离值是构成全部值的一部分，这两个成分值必然有很大关系
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_eight}
+ggplot(data=winequality,aes(x=total.sulfur.dioxide))+
+  geom_histogram()+
+  scale_x_log10()
+summary(winequality$total.sulfur.dioxide)
+```
+
+趋势同free.sulfur.dioxide相似
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_night}
+winequality$prob_freeso2<-winequality$free.sulfur.dioxide/winequality$total.sulfur.dioxide
+ggplot(data=winequality,aes(x=prob_freeso2))+
+  geom_histogram()
+summary(winequality$prob_freeso2)
+```
+
+二者之间的比例趋势果然同之上两个因素相似
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_ten}
+ggplot(data=winequality,aes(x=density))+
+  geom_histogram()
+range(winequality$density)
+```
+
+density的范围是0.99007到1.00369之间
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_eleven}
+ggplot(data=winequality,aes(x=pH))+
+  geom_histogram()
+range(winequality$pH)
+```
+
+ph的范围是2.74到4.01之间
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_twelve}
+ggplot(data=winequality,aes(x=sulphates))+
+  geom_histogram(binwidth = 0.01)+
+  scale_x_continuous(limits = c(0.33,1.25))
+range(winequality$sulphates)
+```
+
+范围在0.33到2之间
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_thirteen}
+ggplot(data=winequality,aes(x=alcohol))+
+  geom_histogram(binwidth =0.1)
+range(winequality$alcohol)
+```
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Univariate_Plots_fourteen}
+winequality$alcohol_g_dm3<-winequality$alcohol*winequality$density*1000
+ggplot(data=winequality,aes(x=alcohol_g_dm3))+
+  geom_histogram(binwidth = 100)
+range(winequality$alcohol_g_dm3)
+```
+
+以上两图趋势相同
+
+### 你的数据集结构是什么？
+这是一个包含1599种红葡萄酒12个成分，质量评分等特征的数据集，其中只有x和quality两列变量是整数值，其他都是数值型
+其他观察：
+1,quality的实际值只有3到8之间，且集中在5,6
+2,由于二氧化硫游离值是构成全部值的一部分，这两个成分值必然有很大关系
+3,residual.sugar中出现最多次的值为1.8~2.3之间,且75%小于2.6
+4,75%的volatile.acidity含量低于1
+5,50%的citric.acid含量低于0.26，最大值为1
+6,75%的chlorides含量小于0.09
+7,total.sulfur.dioxide的中位数为38，最大值为289
+8,density的范围是0.99007到1.00369之间
+9,ph的范围是2.74到4.01之间
+
+### 你的数据集内感兴趣的主要特性有哪些？
+主要是影响quality的变量，从变量介绍中得知"volatile.acidity"，"citric.acid","residual.sugar","chlorides","free.sulfur.dioxide","total.sulfur.dioxide" 等变量都会影响品尝的口感
+
+### 你认为数据集内哪些其他特征可以帮助你探索兴趣特点？
+"pH"值的高低可能会影响其他成分的含量，进而影响口感，"sulphates"如介绍所说，这是一种会影响so2水平的添加剂，可能影响红酒质量
+
+### 根据数据集内已有变量，你是否创建了任何新变量？
+是的，创建了游离so2与总so2的比例这一新变量，还有一个alcol变量的转换变量alcohol_g_dm3,我认为这可能也是影响quality的因素
+
+### 在已经探究的特性中，是否存在任何异常分布？你是否对数据进行一些操作，如清洁、调整或改变数据的形式？如果是，你为什么会这样做？
+residual.sugar，chlorides，total.sulfur.dioxide由于原直方图向右倾斜，对x轴使用了对数转化，便于回归分析；还有一些变量没有用默认的参数，设置了组宽和x轴限制值
+
+
+
+# 双变量绘图选择
+
+首先看一下各个变量之间的相关系数
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,fig.width = 15, fig.height = 15,Bivariate_Plots_one}
+#ggpair 中的文字重叠问题 
+#1，图形的大小设置大一点：{r fig.width = 15, fig.height = 15}
+#2，将里面的文字大小调小一点：ggpairs(your_data, upper = list(continuous = wrap("cor", size = 3)))
+#3，只是在图形中因子化变量：(aes(factor(quality), chlorides)
+ggpairs(winequality, 
+  lower = list(continuous = wrap("points", shape = I('.'))), 
+  upper = list(continuous = wrap("cor", size = 3)),
+  axisLabels = 'internal')
+ggsave('winequality.png')
+```
+
+可以看出没有哪一个成分是与quliaty密切相关的，但是可以看出alcohol,volatile.acidity,sulphates,citric.acid,prob_fressso2,total.sulfur.dioxide,density,chlorides与quality是相对相关的(相关系数绝对值大于0.1),另外就是可以看出虽然pH虽然与quality没有直接关系，但与多种成分都有密切关系.
+
+其中alcohol,alcohol_g_dm3,sulphates,citric.acid,prob_freeso2与quality是相对正相关关系,从以下散点图和summary的数据中可以看出验证.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Bivariate_Plots_two}
+names(winequality)
+ggplot(data=winequality,aes(x=factor(quality),y=alcohol))+
+  geom_boxplot(alpha =0.5)+
+  geom_jitter( alpha = 0.3)
+by(winequality$alcohol,winequality$quality,summary)
+ggplot(data=winequality,aes(x=factor(quality),y=alcohol_g_dm3))+
+  geom_boxplot(alpha =0.5)+
+  geom_jitter( alpha = 0.3)
+by(winequality$alcohol_g_dm3,winequality$quality,summary)
+ggplot(data=winequality,aes(y=sulphates,x=factor(quality)))+
+  geom_boxplot(alpha =0.5)+
+  geom_jitter( alpha = 0.3)
+by(winequality$sulphates,winequality$quality,summary)
+ggplot(data=winequality,aes(y=citric.acid,x=factor(quality)))+
+  geom_boxplot(alpha =0.5)+
+  geom_jitter( alpha = 0.3)
+by(winequality$citric.acid,winequality$quality,summary)
+ggplot(data=winequality,aes(y=prob_freeso2,x=factor(quality)))+
+  geom_boxplot(alpha =0.5)+
+  geom_jitter( alpha = 0.3)
+by(winequality$prob_freeso2,winequality$quality,summary)
+```
+
+另外，volatile.acidity,total.sulfur.dioxide,density,chlorides等变量则与quliaty呈现负相关关系，以下散点图和summary能验证。
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Bivariate_Plots_three}
+ggplot(data=winequality,aes(y=volatile.acidity,x=factor(quality)))+
+  geom_boxplot(alpha =0.5)+
+  geom_jitter( alpha = 0.3)
+by(winequality$volatile.acidity,winequality$quality,summary)
+ggplot(data=winequality,aes(y=log10(total.sulfur.dioxide),x=factor(quality)))+
+  geom_boxplot(alpha =0.5)+
+  geom_jitter( alpha = 0.3)
+by(winequality$total.sulfur.dioxide,winequality$quality,summary)
+ggplot(data=winequality,aes(y=density,x=factor(quality)))+
+  geom_boxplot(alpha =0.5)+
+  geom_jitter( alpha = 0.3)
+by(winequality$density,winequality$quality,summary)
+ggplot(data=winequality,aes(y=log10(chlorides),x=factor(quality)))+
+  geom_boxplot(alpha =0.5)+
+  geom_jitter( alpha = 0.3)
+by(winequality$chlorides,winequality$quality,summary)
+```
+
+无论是正还是负相关，alcohol,prob_freeso2，total.sulfur.dioxide与quality的关系都在中间出现一个最高(低)值，猜测可能与数据源中quality分布不均衡有关
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Bivariate_Plots_four}
+ggplot(data=winequality,aes(x=pH,y=fixed.acidity))+
+  geom_jitter(alpha=0.5)
+ggplot(data = winequality,aes(x=pH,y=citric.acid))+
+  geom_jitter(alpha=0.5)
+```
+
+可以看出pH值与fixed.acidity，citric.acid都有相对线性关系
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Bivariate_Plots_five}
+ggplot(data=winequality,aes(x=fixed.acidity,y=citric.acid))+
+  geom_jitter(alpha=0.2)
+ggplot(data=winequality,aes(x=fixed.acidity,y=density))+
+  geom_jitter(alpha=0.2)
+ggplot(data=winequality,aes(x=volatile.acidity,y=citric.acid))+
+  geom_jitter(alpha=0.2)
+```  
+
+可以看出以上fixed.acidity与density之间，fixed.acidity与citric.acid之间的线性关系相对较强,volatile.acidity与citric.acid呈现负相关，其余为正相关
+
+从之前的分析可以看出alcohol对quality的影响相对较大，来尝试拟合一下二者的线性关系
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Bivariate_Plots_six}
+m1<-lm(quality~alcohol_g_dm3,data = winequality)
+mtable(m1)
+str(winequality)
+```
+
+结果R^2只有0.227，不是很理想，可能还需要再加入其他因素
+
+
+# 双变量分析
+
+### 探讨你在这部分探究中观察到的一些关系。这些感兴趣的特性与数据集内其他特性有什么区别？
+其中alcohol,alcohol_g_dm3,sulphates,citric.acid,prob_freeso2与quality是相对正相关关系；volatile.acidity,total.sulfur.dioxide,density,chlorides等变量则与quliaty呈现负相关关系；无论是正还是负相关，alcohol,prob_freeso2，total.sulfur.dioxide，chlorides与quality的关系都在中间出现一个最高(低)值，猜测可能与数据源中quality分布不均衡有关
+
+### 你是否观察到主要特性与其他特性之间的有趣关系？
+pH值与fixed.acidity，ph值与citric.acid，fixed.acidity与citric.acid，fixed.acidity与density,volatile.acidity与density都有较强线性关系
+
+### 你发现最强的关系是什么？
+alcohol与quality的关系是相对较强的，随着alcohol的增加，quality也随着增加
+
+
+# 多变量绘图选择
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Multivariate_Plots_one}
+#多变量图中的图形使用散点图是很正确的，这里存在的问题在于颜色使用上面，因为quality这个变量属于定序变量，所以我们使用的颜色也需要与这个变量的类型一致。这里使用的颜色没有梯度，无法体现这些等级的梯度，建议使用渐变的颜色：
+#ggplot(aes(x = alcohol, y = density, color = factor(quality)), data = your_data) +
+#geom_jitter(alpha = 0.2) +
+#scale_color_brewer(palette = "Blues") +
+#geom_smooth(method = "lm", se = FALSE,size=1) +
+#ylim(0.985, 1.005) +
+#labs(y = 'Density',x = 'Alcohol') +
+#ggtitle("density VS alcohol VS quality")
+#其中smooth中se参数能保证平滑器不是层面图，而是平滑线1
+
+ggplot(data = winequality,aes(x=pH,y=citric.acid,color=factor(quality)))+
+  geom_jitter(alpha=0.5)+
+  scale_color_brewer(palette = 'Blues')+
+geom_smooth(method = "lm",se = FALSE,size=1)
+```
+
+在线性负相关的前提下，quality越高，citric.acid越高，ph越低
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Multivariate_Plots_two}
+ggplot(data=winequality,aes(x=fixed.acidity,y=citric.acid,color=factor(quality)))+
+  geom_jitter(alpha=0.5)+
+  scale_color_brewer(palette = 'Blues')+
+  geom_smooth(method = "lm",se = FALSE,size=1)
+```
+
+在线性正相关的前提下，quality越高，citric.acid越高，fixed.acidity越高
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Multivariate_Plots_three}
+ggplot(data=winequality,aes(x=fixed.acidity,y=density,color=factor(quality)))+
+  geom_jitter(alpha=0.5)+
+  scale_color_brewer(palette = 'Blues')+
+  geom_smooth(method = "lm",se = FALSE,size=1)
+```
+
+在线性正相关的前提下，quality越高，fixed.acidity越低，density越低
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,Multivariate_Plots_four}
+m1<-lm(quality~alcohol_g_dm3,data = winequality)
+m2<-update(m1,~.+sulphates)
+m3<-update(m2,~.+citric.acid)
+m4<-update(m3,~.+prob_freeso2)
+m5<-update(m4,~.+volatile.acidity)
+m6<-update(m5,~.+I(log(total.sulfur.dioxide)))
+m7<-update(m6,~.+density)
+m8<-update(m7,~.+I(log(chlorides)))
+mtable(m1,m2,m3,m4,m5,m6,m7,m8)
+```
+
+最终拟合的R^2只有0.35，不是很理想，可见本数据集中的变量并不能很好拟合quality的线性模型
+综上所述，虽然各成分都没有与quality比较强的线性关系，但各种成分之间的影响相对较大，如出pH值与fixed.acidity，PH与citric.acid，fixed.acidity与citric.acid，fixed.acidity与density,volatile.acidity与citric.acid
+
+
+# 多变量分析
+
+### 探讨你在这部分探究中观察到的一些关系。通过观察感兴趣的特性，是否存在相互促进的特性？
+在线性负相关的前提下，quality越高，citric.acid越高，ph越低；在线正性相关的前提下，quality越高，citric.acid越高，fixed.acidity越高；在线性正相关的前提下，quality越高，fixed.acidity越低，density越低
+
+### 这些特性之间是否存在有趣或惊人的联系呢？
+由于相互之间的线性关系，存在连续线性关系，即citric.acid越高，fixed.acidity越高，density越高，pH越低
+
+### 选项：你是否创建过数据集的任何模型？讨论你模型的优缺点。
+lm模型，可能由于数据分布的不均衡，(quality为5,6的数据偏多)，拟合效果不是很好
+
+
+# 定稿图与总结
+
+### 绘图一
+```{r echo=FALSE, message=FALSE, warning=FALSE,  Plot_One}
+ggplot(data=winequality,aes(x=quality))+
+  geom_bar()+
+  labs(x="Quality Score",y="Count for each Score",title='Quality Score Count')
+```
+
+### 描述一
+
+可以看出quality为5和6的项是最多的，可能是由于数据不均衡造成的
+
+### 绘图二
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,  Plot_Two}
+#颜色的使用scale_colour_gradientn(colours=rainbow(4))
+ggplot(data=winequality,aes(x=pH,y=citric.acid,color=citric.acid))+
+  geom_jitter(alpha=0.2)+
+  labs(x="pH",y="Citric.acid",title='Citric.acid by pH')+
+  scale_colour_gradientn(colours=rainbow(4))
+```
+
+### 描述二
+
+负相关关系，pH的测量与酸性有关，citric.acid也是算的一种
+
+### 绘图三
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,  Plot_Three}
+#背景色的设置theme(panel.backgroud)
+#颜色式样的使用scale_fill_brewer(palette)
+#xy轴的标签和图表题目设置可用labs，标题还可以用ggtitle
+ggplot(data=winequality,aes(y=volatile.acidity,x=factor(quality)))+
+  geom_boxplot(aes(fill=factor(quality)))+
+  scale_fill_brewer(palette = 'YIGn')+
+  theme(panel.background=element_rect(fill='gray',color='black'))+
+  labs(y='Volatile.acidity',x='Quality',title='Volatile.acidity by Quality')
+```
+
+### 描述三
+
+可以看出Volatile.acidity基本随着quliaty的上升而下降，符合变量说明中的"the amount of acetic acid in wine, which at too high of levels can lead to an unpleasant, vinegar taste"
+
+
+# 反思
+
+这个数据集本身包含了1500多种葡萄酒的各种成分和quality评分。从对各个变量的单变量分析，我对葡萄酒的质量分数比较感兴趣，于是从说明文档入手，分析了与质量相关的成分与质量之间的关系，但可能由于质量分数是分类变量，与成分这种连续变量之间的关系并不强，于是我又分析了成分与成分之间的关系，其中，pH值与多种成分的相关系数相对较高，如fixed.acidity，citric.acid；还有volatile.acidity与citric.acid之间，fixed.acidity与density之间，fixed.acidity与citric.acid之间都有较强相关关系。
+对quality与其他因素的线性模拟不是很理想，一个是因为quality不是连续变量，在分析中比较不好量化，还有就是quality的分布不均衡，5,6的质量分数相对其他分数明显过多。最后，这个数据集是2009年收集的，到今天已经接近10年了，即使模拟出来的数据也可能不是很匹配了。
+这个项目目前学到的模型有限，分析出来的结果也有限，希望未来通过课程的学习和自学能够掌握其他数据模型的分析方法或者线性函数的高阶运用，来分析这个数据集，更好地拟合对红酒质量影响的函数
