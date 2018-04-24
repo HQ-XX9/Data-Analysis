@@ -1,0 +1,10 @@
+(lp0
+S'poi'
+p1
+aS'rescaled_salary'
+p2
+aS'rescaled_bonus'
+p3
+aS'rescaled_to_poi_ratio'
+p4
+a.
